@@ -1,0 +1,23 @@
+# compiled output
+/tmp
+
+# Node build artifacts
+node_modules
+npm-debug.log
+/node_modules
+/bower_components
+
+# Local development
+*.env
+*.dev
+.DS_Store
+
+# e2e
+/e2e/*.js
+/e2e/*.map
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+dist/
