@@ -5,6 +5,7 @@
         "body-parser": "~1.0.1",
         "express": "~4.0.0",
         "mongoose": "^4.9.4",
-        "phantom": "^6.0.3"
+        "phantom": "^6.0.3",
+        "socket.io": "^2.1.1"
     }
 }

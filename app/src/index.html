@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Save the internet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+        $(function () {
+            var socket = io();
+    
+            socket.on('stock price update', function(stockprice) {
+            $('#stockprice').text(stockprice);
+            });
+    
+        });
+    </script>
+</head>
+<body>
+    <body>
+        Stock price: <span id="stockprice">no data yet</span>
+    </body>
+</body>
+</html>
