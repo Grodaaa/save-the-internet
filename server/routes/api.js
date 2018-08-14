@@ -3,7 +3,7 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const phantom = require('phantom');
 const fs = require('fs');
-
+var socketio = require('socket.io');
 
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({
@@ -16,6 +16,23 @@ var ScreenshotSchema = require('../../app/models/screenshot');
 router.get('/', function(req, res) {
     res.json({ message: 'Hej 👋' }); 
 });
+
+module.exports.listen = function(server){
+    io = socketio.listen(server);
+
+    io.on('connection', function(socket){
+        console.log('A new WebSocket connection has been established');
+    
+        socket.on('create screenshot', function(data) {
+            console.log("hej data", data);
+            // client.emit('broad', data);
+    //		client.broadcast.emit('broad',data);
+               //client.broadcast.emit('broad',data);
+        });
+    });
+};
+
+
 
 router.route('/screenshot')
     .post(function(req, res) {
@@ -33,9 +50,10 @@ router.route('/screenshot')
                         screenshot.img.data = fs.readFileSync(imagePath);
                         screenshot.img.contentType = 'image/png';
                         screenshot.save(function (err, screenshot) {
-                            if (err) 
+                            if (err) {
                                 throw err;
-                    
+                            }
+                            // io.emit('new imaged saved', imagePath);
                             console.error('saved img to mongo');
                         });
                     });

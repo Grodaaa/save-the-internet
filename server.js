@@ -4,6 +4,10 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+const phantom = require('phantom');
+const fs = require('fs');
+
+var ScreenshotSchema = require('./app/models/screenshot');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -25,12 +29,56 @@ app.get('/', function(req, res) {
 
 io.on('connection', function(socket){
     console.log('A new WebSocket connection has been established');
+
+    socket.on('join', function(data) {
+        console.log(data);
+    });
+
+    socket.on('create screenshot', function(data) {
+        var urls = [];
+        urls = data.replace(/\s/g, "").split(',');
+
+        urls.forEach(element => {
+            var screenshot = new ScreenshotSchema();
+            screenshot.url = element;
+            ScreenshotSchema.find({url: screenshot.url}, (err, screenshots) => {
+                if(screenshots.length === 0 ) {
+                    var fileName = screenshot.url.replace(/\//g, "-");
+                    var imagePath = 'screenshots/' + fileName + '.png';
+
+                    renderImage(screenshot.url, imagePath).then(() => {
+                        screenshot.img.data = fs.readFileSync(imagePath);
+                        screenshot.img.contentType = 'image/png';
+                        screenshot.save(function (err, screenshot) {
+                            if (err) {
+                                throw err;
+                            }
+                            console.error('saved img to mongo');
+                        });
+                    });
+                    socket.emit('get image', screenshot.img);
+                } else {
+                    console.log("screenshot already created!");
+                    socket.emit('get image', screenshots[0].img);
+                }
+            })
+            
+        });
+        socket.emit('broad', 'data');
+    });
 });
 
-setInterval(function() {
-    var stockprice = Math.floor(Math.random() * 1000);
-    io.emit('stock price update', stockprice);
-  }, 50);
+async function renderImage(url, imagePath) {
+    const instance = await phantom.create();
+    const page = await instance.createPage();
+
+    const status = await page.open(url);
+    console.log(status);
+    const content = await page.property('content');
+    const image = await page.render(imagePath);
+
+    await instance.exit();
+}
   
 http.listen(port, function() {
     console.log('Magic happens on port ' + port);

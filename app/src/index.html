@@ -7,20 +7,60 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script>
-        $(function () {
-            var socket = io();
-    
-            socket.on('stock price update', function(stockprice) {
-            $('#stockprice').text(stockprice);
-            });
-    
-        });
-    </script>
 </head>
 <body>
-    <body>
-        Stock price: <span id="stockprice">no data yet</span>
-    </body>
+    <h1>Screenshot as a service</h1>
+    <div id="screenshot_img"></div>
+    <form id="url_form" id="chat_form">
+        <input id="url_input" type="text">
+        <input type="submit" value="Send">
+    </form>
 </body>
 </html>
+
+<script>
+    var socket = io.connect();
+
+    socket.on('connect', function(data) {
+        socket.emit('join', 'Hello World from client');
+    });
+
+    socket.on('get image', function(screenshot) {
+        var id = guid();
+        createImgTag(id);
+        addImgToImgTag(id, screenshot);
+    });
+
+    function createImgTag(id) {
+        $('#screenshot_img').append('<img id=' + id + ' src=""/>');
+    }
+
+    function addImgToImgTag(id, screenshot) {
+        var img = document.getElementById(id);
+
+        var binary = '';
+        var bytes = new Uint8Array( screenshot.data );
+        var len = bytes.byteLength;
+        for (var i = 0; i < len; i++) {
+            binary += String.fromCharCode( bytes[ i ] );
+        }
+        src = "data: " + screenshot.contentType + ";base64," + (window.btoa(binary));
+        img.setAttribute('src', src);
+    }
+
+    function guid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+        }
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+    }
+
+    $('form').submit(function(e){
+                e.preventDefault();
+                var urlList = $('#url_input').val();
+                console.log("urlList", urlList);
+                socket.emit('create screenshot', urlList);
+    });
+    </script>
