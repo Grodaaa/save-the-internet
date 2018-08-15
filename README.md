@@ -13,9 +13,9 @@
 * ```$ npm install```
 
 ### Run the app
-Make sure you have mongoDB running.
-```$ node server```
-Open your browser and navigate to http://localhost:8080/
+* Make sure you have mongoDB running.
+* ```$ node server```
+* Open your browser and navigate to http://localhost:8080/
 
 Enter one or more urls in the text box. The urls' should be separated by commas ','
 Click enter and, hopefully, the screenshots should pop up one by one.
