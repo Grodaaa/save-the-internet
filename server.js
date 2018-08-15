@@ -23,6 +23,7 @@ app.get('/', function(req, res) {
     res.sendfile('./app/src/index.html');
 });
 
+//Setting upp websocket connections
 io.on('connection', function(socket){
     console.log('A new WebSocket connection has been established');
 
@@ -36,10 +37,13 @@ io.on('connection', function(socket){
 
         urls.forEach(element => {
             socket.emit('image process status', "Creating screenshot from " + element + "...");
+
             var screenshot = new ScreenshotSchema();
             screenshot.url = element;
+
             ScreenshotSchema.find({url: screenshot.url}, (err, screenshots) => {
-                if(screenshots.length === 0 ) {
+
+                if(screenshots.length === 0 ) { // If no screenshots were found with given url -> create a new and save in db
                     var fileName = screenshot.url.replace(/\//g, "-");
                     var imagePath = 'screenshots/' + fileName + '.png';
 
@@ -50,29 +54,25 @@ io.on('connection', function(socket){
                             if (err) {
                                 throw err;
                             }
-                            console.error('saved img to mongo');
                             socket.emit('image process status', "Screenshot from " + element + " has been saved to database!");
-                            socket.emit('get image', screenshot.img);
+                            socket.emit('send image', screenshot.img);
 
-                            fs.unlink(imagePath, (err) => {
+                            fs.unlink(imagePath, (err) => { // Remove file on disk after saving to db
                                 if (err) throw err;
                                 console.log('successfully deleted ' + imagePath);
                             });
                         });
                     });
-                } else {
+                } else { // If a screenshot was found -> return to client
                     socket.emit('image process status', "Screenshot already created, fetching from database...");
-                    console.log("screenshot already created!");
-                    socket.emit('get image', screenshots[0].img);
+                    socket.emit('send image', screenshots[0].img);
                 }
-            })
-            
+            });
         });
-        socket.emit('broad', 'data');
     });
 });
 
-async function renderImage(url, imagePath) {
+async function renderImage(url, imagePath) { // render image using PhantomJS
     const instance = await phantom.create();
     const page = await instance.createPage();
 
@@ -80,6 +80,7 @@ async function renderImage(url, imagePath) {
     console.log(status);
     const content = await page.property('content');
     const image = await page.render(imagePath);
+
     await instance.exit();
 }
   

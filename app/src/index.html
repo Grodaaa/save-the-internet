@@ -25,20 +25,24 @@
         socket.emit('join', 'Hello from client! ');
     });
 
+    // Prints out status for screenshots
     socket.on('image process status', function(status) {
         $('#screenshot_img').append("<br/>" + status+ "<br/>");
     });
 
-    socket.on('get image', function(screenshot) {
+    // recive image from server
+    socket.on('send image', function(screenshot) {
         var id = guid();
         createImageElement(id);
         addImageToElement(id, screenshot);
     });
 
+    // create new img-tag for screenshot, set deafult hight to 400 so it will be easier to see all images. 
     function createImageElement(id) {
         $('#screenshot_img').append('<img id=' + id + ' src="" height="400"/>');
     }
 
+    // Turn array buffer from db to a base64 string
     function addImageToElement(id, screenshot) {
         var binary = '';
         var bytes = new Uint8Array( screenshot.data );
@@ -51,6 +55,7 @@
         img.setAttribute('src', src);
     }
 
+    // creating unique id for image element
     function guid() {
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)
@@ -60,6 +65,7 @@
         return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
     }
 
+    // send urls from form to server
     $('form').submit(function(e){
                 e.preventDefault();
                 var urlList = $('#url_input').val();
