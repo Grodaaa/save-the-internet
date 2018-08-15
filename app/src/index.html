@@ -32,12 +32,10 @@
     });
 
     function createImgTag(id) {
-        $('#screenshot_img').append('<img id=' + id + ' src=""/>');
+        $('#screenshot_img').append('<img id=' + id + ' src="" height="200"/>');
     }
 
     function addImgToImgTag(id, screenshot) {
-        var img = document.getElementById(id);
-
         var binary = '';
         var bytes = new Uint8Array( screenshot.data );
         var len = bytes.byteLength;
@@ -45,6 +43,8 @@
             binary += String.fromCharCode( bytes[ i ] );
         }
         src = "data: " + screenshot.contentType + ";base64," + (window.btoa(binary));
+
+        var img = document.getElementById(id);
         img.setAttribute('src', src);
     }
 

@@ -54,9 +54,9 @@ io.on('connection', function(socket){
                                 throw err;
                             }
                             console.error('saved img to mongo');
+                            socket.emit('get image', screenshot.img);
                         });
                     });
-                    socket.emit('get image', screenshot.img);
                 } else {
                     console.log("screenshot already created!");
                     socket.emit('get image', screenshots[0].img);
