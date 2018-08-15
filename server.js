@@ -1,5 +1,5 @@
-var express    = require('express');        // call express
-var app        = express();                 // define our app using express
+var express = require('express');
+var app  = express();  
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
@@ -17,11 +17,7 @@ var port = process.env.PORT || 8080;
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/code-test')
   .then(() =>  console.log('MongoDB 💙 Mongoose: connection succesfull'))
-  .catch((err) => console.error(err));
-
-const api = require('./server/routes/api');
-
-app.use('/api', api);
+  .catch((err) => console.error(err))
 
 app.get('/', function(req, res) {
     res.sendfile('./app/src/index.html');

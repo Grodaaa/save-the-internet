@@ -22,7 +22,7 @@
     var socket = io.connect();
 
     socket.on('connect', function(data) {
-        socket.emit('join', 'Hello World from client');
+        socket.emit('join', 'Hello from client! ');
     });
 
     socket.on('image process status', function(status) {
@@ -31,23 +31,22 @@
 
     socket.on('get image', function(screenshot) {
         var id = guid();
-        createImgTag(id);
-        addImgToImgTag(id, screenshot);
+        createImageElement(id);
+        addImageToElement(id, screenshot);
     });
 
-    function createImgTag(id) {
-        $('#screenshot_img').append('<img id=' + id + ' src="" height="200"/>');
+    function createImageElement(id) {
+        $('#screenshot_img').append('<img id=' + id + ' src="" height="400"/>');
     }
 
-    function addImgToImgTag(id, screenshot) {
+    function addImageToElement(id, screenshot) {
         var binary = '';
         var bytes = new Uint8Array( screenshot.data );
         var len = bytes.byteLength;
         for (var i = 0; i < len; i++) {
             binary += String.fromCharCode( bytes[ i ] );
         }
-        src = "data: " + screenshot.contentType + ";base64," + (window.btoa(binary));
-
+        var src = "data: " + screenshot.contentType + ";base64," + (window.btoa(binary));
         var img = document.getElementById(id);
         img.setAttribute('src', src);
     }
