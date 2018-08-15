@@ -25,6 +25,10 @@
         socket.emit('join', 'Hello World from client');
     });
 
+    socket.on('image process status', function(status) {
+        $('#screenshot_img').append("<br/>" + status+ "<br/>");
+    });
+
     socket.on('get image', function(screenshot) {
         var id = guid();
         createImgTag(id);

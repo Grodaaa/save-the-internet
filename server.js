@@ -39,6 +39,7 @@ io.on('connection', function(socket){
         urls = data.replace(/\s/g, "").split(',');
 
         urls.forEach(element => {
+            socket.emit('image process status', "Creating screenshot from " + element + "...");
             var screenshot = new ScreenshotSchema();
             screenshot.url = element;
             ScreenshotSchema.find({url: screenshot.url}, (err, screenshots) => {
@@ -54,10 +55,12 @@ io.on('connection', function(socket){
                                 throw err;
                             }
                             console.error('saved img to mongo');
+                            socket.emit('image process status', "Screenshot from " + element + " has been saved to database!");
                             socket.emit('get image', screenshot.img);
                         });
                     });
                 } else {
+                    socket.emit('image process status', "Screenshot already created, fetching from database...");
                     console.log("screenshot already created!");
                     socket.emit('get image', screenshots[0].img);
                 }
