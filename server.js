@@ -57,6 +57,11 @@ io.on('connection', function(socket){
                             console.error('saved img to mongo');
                             socket.emit('image process status', "Screenshot from " + element + " has been saved to database!");
                             socket.emit('get image', screenshot.img);
+
+                            fs.unlink(imagePath, (err) => {
+                                if (err) throw err;
+                                console.log('successfully deleted ' + imagePath);
+                            });
                         });
                     });
                 } else {
@@ -79,7 +84,6 @@ async function renderImage(url, imagePath) {
     console.log(status);
     const content = await page.property('content');
     const image = await page.render(imagePath);
-
     await instance.exit();
 }
   
